@@ -1,9 +1,249 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>My Website</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deep Dive: the gas laws, one dive</title>
+<!--
+  HOW TO REPLACE THE PLACEHOLDERS
+  Put your hand-drawn PNGs in an "images" folder next to this file, named exactly:
+    images/diver.png    (stop 1, about 70 px wide on the page)
+    images/balloon.png  (stop 1, resized by the code)
+    images/bubble.png   (stop 3, resized by the code)
+    images/fish.png     (decoration, appears three times)
+    images/tank.png     (stop 4)
+  Until a file exists, a dashed placeholder box with the file name is shown instead.
+-->
+<script>
+// Builds a placeholder picture when images/<name>.png is missing.
+function ph(n){
+  var c={diver:'#ff7f50',balloon:'#ffd166',bubble:'#bfefff',fish:'#9d8df1',tank:'#9fb3c8'}[n]||'#ccc';
+  var h={diver:160,tank:200,fish:70}[n]||120;
+  var s="<svg xmlns='http://www.w3.org/2000/svg' width='120' height='"+h+"'><rect x='2' y='2' width='116' height='"+(h-4)+"' rx='14' fill='"+c+"' fill-opacity='.85' stroke='#fff' stroke-width='3' stroke-dasharray='8 6'/><text x='60' y='"+(h/2+5)+"' text-anchor='middle' font-family='Georgia' font-size='15' fill='#06284a'>"+n+".png</text></svg>";
+  return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(s);
+}
+</script>
+<style>
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;overflow-x:hidden;font-family:Georgia,"Times New Roman",serif;color:#e8f6ff;line-height:1.55;
+  /* The scroll-driven look: one tall gradient across the whole page, so scrolling down is going deeper. */
+  background:linear-gradient(180deg,#c8f1ff 0%,#74cdf0 12%,#2f97cf 30%,#146099 50%,#09375f 70%,#041a31 86%,#010b16 100%);
+}
+#rays{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:1;
+  background:radial-gradient(ellipse 70% 55% at 50% -8%,rgba(255,255,255,.6),rgba(255,255,255,0) 70%)}
+.hero{position:relative;z-index:1;text-align:center;color:#06385a;padding:72px 20px 110px}
+.hero h1{font-size:clamp(46px,9vw,84px);font-weight:400;letter-spacing:.02em;margin:0 0 10px;line-height:1}
+.hero p{max-width:34em;margin:0 auto 12px;font-size:18px}
+.hero small{display:block;margin-top:34px;font-size:15px;font-style:italic}
+main{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:0 16px 40px}
+.bar{position:sticky;top:8px;z-index:10;display:flex;gap:14px;align-items:center;flex-wrap:wrap;
+  background:rgba(4,24,43,.82);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:10px 16px;margin-bottom:56px}
+.bar label{font-size:15px}.bar input{flex:1;min-width:150px}
+.bar b{min-width:62px;display:inline-block}
+.stop{position:relative;z-index:1;background:rgba(4,24,43,.66);border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:22px;margin:0 0 96px}
+.stop h2{font-weight:400;font-size:26px;margin:0 0 6px;color:#9fe5ff}
+.lead{margin:0 0 16px;font-size:16px;max-width:42em}
+.cols{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start}
+.col{flex:1;min-width:250px}
+.scene{position:relative;flex:none;width:250px;height:340px;max-width:100%;border:1px solid rgba(255,255,255,.25);border-radius:10px;overflow:hidden;
+  background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(0,0,0,.4))}
+.scene .t{position:absolute;left:0;right:0;border-top:1px solid rgba(255,255,255,.28);font-size:11px;padding-left:5px;color:#d6f1ff}
+.scene .t.mk{border-top:1px dashed #ffd166;color:#ffd166;text-align:right;padding-right:6px}
+.scene img{position:absolute;height:auto}
+.rr{display:flex;justify-content:space-between;gap:10px;font-size:15px;padding:5px 0;border-bottom:1px dotted rgba(255,255,255,.3)}
+.note{font-size:14px;color:#b9dcf0;margin:8px 0}
+.pill{font:inherit;font-size:14px;padding:6px 13px;margin:0 6px 6px 0;border:1px solid #6fd6ff;color:#bff0ff;background:transparent;border-radius:16px;cursor:pointer}
+.pill[aria-pressed="true"]{background:#6fd6ff;color:#06284a}
+button:focus-visible,input:focus-visible{outline:3px solid #ffd166;outline-offset:2px}
+.track{height:18px;background:rgba(255,255,255,.12);border-radius:4px;position:relative;margin:4px 0 12px}
+.track i{position:absolute;left:0;top:0;bottom:0;border-radius:4px}
+.track b{position:absolute;top:-4px;width:2px;height:26px;background:#ff8a5c}
+.warn{color:#ffd166;min-height:3em;margin-top:6px}
+input[type=range]{accent-color:#6fd6ff}
+.fish{position:absolute;z-index:0;width:96px;height:auto;opacity:.85;pointer-events:none;animation:sw 16s ease-in-out infinite alternate}
+@keyframes sw{to{transform:translateX(70px)}}
+footer{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:0 16px 60px;font-size:14px;color:#a9cde3}
+footer p{max-width:46em}
+@media (prefers-reduced-motion:reduce){.fish{animation:none}html{scroll-behavior:auto}}
+@media (max-width:600px){.fish{display:none}.stop{padding:16px}}
+</style>
 </head>
 <body>
-    <h1>Hello World! Welcome to my GitHub Page.</h1>
+<div id="rays"></div>
+
+<header class="hero">
+  <h1>Deep Dive</h1>
+  <p>Follow a scuba diver down and watch four gas laws appear on the way. Drag the depth slider and see what changes.</p>
+  <p>This page is a chemistry demonstration, not a dive-planning tool.</p>
+  <small>Scroll down to descend</small>
+</header>
+
+<main>
+  <img class="fish" src="images/fish.png" data-ph="fish" alt="" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="top:16%;left:2%">
+  <img class="fish" src="images/fish.png" data-ph="fish" alt="" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="top:46%;right:2%;width:80px">
+  <img class="fish" src="images/fish.png" data-ph="fish" alt="" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="top:74%;left:6%;width:110px">
+
+  <div class="bar">
+    <label for="d">Depth</label>
+    <input type="range" id="d" min="0" max="60" value="0">
+    <span><b id="dl">0 m</b><b id="pl">1.0 atm</b></span>
+  </div>
+
+  <section class="stop" id="s1">
+    <h2>Stop 1: Descent</h2>
+    <p class="lead">A balloon filled with 1 L of air at the surface goes down with the diver. Pressure rises by about 1 atm for every 10 m, and the balloon shrinks to match. This is Boyle’s law: at constant temperature, P₁V₁ = P₂V₂.</p>
+    <div class="cols">
+      <div class="scene" id="sc1">
+        <img id="diver" src="images/diver.png" data-ph="diver" alt="Hand-drawn diver" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="left:34px;width:70px">
+        <img id="balloon" src="images/balloon.png" data-ph="balloon" alt="Hand-drawn balloon" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="left:120px">
+      </div>
+      <div class="col">
+        <div class="rr"><span>Pressure</span><b id="r1p"></b></div>
+        <div class="rr"><span>Balloon volume</span><b id="r1v"></b></div>
+        <div class="rr"><span>Pressure × volume</span><b id="r1c"></b></div>
+        <p class="note">Pressure times volume stays the same at every depth. That constant is Boyle’s law.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="stop" id="s2">
+    <h2>Stop 2: The mix</h2>
+    <p class="lead">Each gas in the tank adds its own pressure. Dalton’s law says the total is the sum of the partial pressures, and each partial pressure is the mole fraction times the total. The orange marks show commonly cited limits.</p>
+    <div class="cols"><div class="col">
+      <div role="group" aria-label="Breathing gas">
+        <button class="pill" id="x1" aria-pressed="true">Air, 21% O₂</button>
+        <button class="pill" id="x2" aria-pressed="false">Nitrox, 32% O₂</button>
+        <button class="pill" id="x3" aria-pressed="false">Pure O₂</button>
+      </div>
+      <div>Oxygen: <b id="po"></b> (limit about 1.4 atm)</div>
+      <div class="track"><i id="bo" style="background:#35d0c0"></i><b style="left:17.5%"></b></div>
+      <div>Nitrogen: <b id="pn"></b> (narcosis begins near 3.2 atm)</div>
+      <div class="track"><i id="bn" style="background:#a99cf5"></i><b style="left:40%"></b></div>
+      <div id="tot"></div>
+      <div class="warn" id="wn"></div>
+    </div></div>
+  </section>
+
+  <section class="stop" id="s3">
+    <h2>Stop 3: Ascent</h2>
+    <p class="lead">The diver exhales a 1 L bubble at 30 m. Slide up and it expands as pressure falls. Turn on water temperature and the bubble also warms, so you need the combined gas law, P₁V₁/T₁ = P₂V₂/T₂.</p>
+    <div class="cols">
+      <div class="scene" id="sc3">
+        <div class="t mk" style="top:150px">bubble released at 30 m</div>
+        <img id="bub" src="images/bubble.png" data-ph="bubble" alt="Hand-drawn bubble" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="left:100px">
+      </div>
+      <div class="col">
+        <button class="pill" id="tg" aria-pressed="false">Include water temperature</button>
+        <div class="rr"><span>Pressure</span><b id="r3p"></b></div>
+        <div class="rr"><span>Water temperature</span><b id="r3t"></b></div>
+        <div class="rr"><span>Bubble volume</span><b id="r3v"></b></div>
+        <p class="note" id="eq3"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="stop" id="s4">
+    <h2>Stop 4: The tank</h2>
+    <p class="lead">A full tank holds gas at around 200 atm, where the ideal gas law starts to fail. Compare it with a van der Waals model. Z = PV/nRT equals 1 for an ideal gas.</p>
+    <div class="cols">
+      <img id="tank" src="images/tank.png" data-ph="tank" alt="Hand-drawn tank" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="width:120px;height:auto">
+      <div class="col">
+        <div role="group" aria-label="Gas">
+          <button class="pill" id="gN" aria-pressed="true">N₂</button>
+          <button class="pill" id="gO" aria-pressed="false">O₂</button>
+          <button class="pill" id="gH" aria-pressed="false">He</button>
+        </div>
+        <div>Tank pressure: <b id="pv"></b></div><input type="range" id="p" min="1" max="300" value="200" style="width:100%" aria-label="Tank pressure">
+        <div style="margin-top:6px">Temperature: <b id="tv"></b></div><input type="range" id="t" min="270" max="320" value="285" style="width:100%" aria-label="Temperature">
+        <div style="margin-top:12px">Ideal gas, 1 mol: <span id="vi"></span></div><div class="track"><i id="bi" style="background:#6fd6ff"></i></div>
+        <div>Real gas, 1 mol: <span id="vr"></span></div><div class="track"><i id="br" style="background:#ffd166"></i></div>
+        <div>Z = <b id="zz"></b></div>
+        <div class="warn" id="ms"></div>
+        <p class="note" id="tn"></p>
+      </div>
+      <svg viewBox="0 0 320 160" width="300" role="img" aria-label="Z against pressure">
+        <line x1="36" y1="10" x2="36" y2="130" stroke="#8fb6cf"/><line x1="36" y1="130" x2="310" y2="130" stroke="#8fb6cf"/>
+        <line id="z1" x1="36" x2="310" stroke="#ff8a5c" stroke-dasharray="4 4"/>
+        <text x="4" y="14" font-size="12" fill="#e8f6ff">Z</text>
+        <text x="310" y="150" font-size="11" fill="#e8f6ff" text-anchor="end">pressure, 0 to 300 atm</text>
+        <text id="zt" x="30" font-size="10" fill="#ff8a5c" text-anchor="end">1</text>
+        <polyline id="cv" fill="none" stroke="#ffd166" stroke-width="2.5"/><circle id="pt" r="5" fill="#fff"/>
+      </svg>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p>Notes and sources: add your citations here. Pressure is taken as 1 atm plus 1 atm per 10 m of seawater. The oxygen limit of 1.4 atm and the nitrogen narcosis threshold of about 3.2 atm are commonly cited guidelines and vary by source. Water temperature (25 °C at the surface, 5 °C at 30 m) is an assumed profile. Van der Waals constants are standard textbook values, so check them against your course data table.</p>
+</footer>
+
+<script>
+var $=function(i){return document.getElementById(i)};
+var Rg=0.082057, mix=0.21, tOn=false, gas='N';
+var VDW={N:{a:1.370,b:0.0387},O:{a:1.382,b:0.03186},H:{a:0.0346,b:0.0238}};   // L²·atm/mol², L/mol
+var Y=function(d){return 20+d*260/60};                                        // depth (m) to pixel in the scenes
+
+// depth tick marks for the two scenes
+['sc1','sc3'].forEach(function(id){for(var d=0;d<=60;d+=10){var e=document.createElement('div');e.className='t';e.style.top=Y(d)+'px';e.textContent=d+' m';$(id).appendChild(e)}});
+
+function pressed(el,on){el.setAttribute('aria-pressed',on?'true':'false')}
+
+function depthUpdate(){
+  var d=+$('d').value, P=1+d/10, y=Y(d);
+  $('dl').textContent=d+' m'; $('pl').textContent=P.toFixed(1)+' atm';
+  // Stop 1: Boyle's law, balloon filled with 1 L at the surface
+  var V1=1/P, w1=56*Math.cbrt(V1);
+  $('diver').style.top=(y-45)+'px';
+  $('balloon').style.width=w1+'px'; $('balloon').style.top=(y-w1/2-14)+'px';
+  $('r1p').textContent=P.toFixed(1)+' atm'; $('r1v').textContent=V1.toFixed(2)+' L'; $('r1c').textContent=(P*V1).toFixed(2)+' atm·L';
+  // Stop 2: Dalton's law
+  var po=mix*P, pn=(1-mix)*P;
+  $('po').textContent=po.toFixed(2)+' atm'; $('pn').textContent=pn.toFixed(2)+' atm';
+  $('bo').style.width=Math.min(po/8,1)*100+'%'; $('bn').style.width=Math.min(pn/8,1)*100+'%';
+  $('bo').style.background=po>1.4?'#ff8a5c':'#35d0c0'; $('bn').style.background=pn>3.2?'#ff8a5c':'#a99cf5';
+  $('tot').textContent='Total pressure: '+po.toFixed(2)+' + '+pn.toFixed(2)+' = '+P.toFixed(2)+' atm. Deepest depth where oxygen stays under 1.4 atm for this mix: about '+(10*(1.4/mix-1)).toFixed(0)+' m.';
+  $('wn').textContent=po>1.4?'Oxygen pressure is past the usual limit. Oxygen toxicity becomes a risk.':(pn>3.2?'Nitrogen pressure is in the narcosis range, where judgement starts to blur.':'Both partial pressures are within the usual limits.');
+  // Stop 3: combined gas law, 1 L bubble released at 30 m (4 atm)
+  var T=tOn?298-20*Math.min(d,30)/30:298, V3;
+  if(d>=30){V3=1}else{V3=(4/P)*(T/(tOn?278:298))}
+  var w3=44*Math.cbrt(V3);
+  $('bub').style.width=w3+'px'; $('bub').style.top=(y-w3/2)+'px';
+  $('r3p').textContent=P.toFixed(1)+' atm'; $('r3t').textContent=T.toFixed(0)+' K ('+(T-273).toFixed(0)+' °C)';
+  $('r3v').textContent=V3.toFixed(2)+' L'+(d>=30?' (not yet released)':'');
+  $('eq3').textContent=tOn?'Combined gas law: the bubble also warms as it rises, so it grows more than Boyle’s law alone predicts.':'Boyle’s law only: temperature is held constant.';
+}
+
+// Stop 4: van der Waals volume by bisection
+function vm(P,T,a,b){var RT=Rg*T,lo=b*1.0001,hi=RT/P*2+b*2;for(var i=0;i<60;i++){var m=(lo+hi)/2,f=(P+a/(m*m))*(m-b)-RT;if(f>0)hi=m;else lo=m}return (lo+hi)/2}
+function tankUpdate(){
+  var P=+$('p').value,T=+$('t').value,g=VDW[gas],RT=Rg*T,vi=RT/P,vr=vm(P,T,g.a,g.b),z=P*vr/RT,mx=Math.max(vi,vr);
+  $('pv').textContent=P+' atm'; $('tv').textContent=T+' K ('+(T-273)+' °C)';
+  $('bi').style.width=(vi/mx*100)+'%'; $('br').style.width=(vr/mx*100)+'%';
+  $('vi').textContent=(vi*1000).toFixed(1)+' mL'; $('vr').textContent=(vr*1000).toFixed(1)+' mL'; $('zz').textContent=z.toFixed(3);
+  $('ms').textContent=z<0.995?'Z is below 1: attractions between molecules dominate, so the real gas is more compressed than ideal.':(z>1.005?'Z is above 1: the size of the molecules dominates, so the real gas takes up more room than ideal.':'Z is close to 1: the ideal gas law works well here.');
+  var pc=(1/z-1)*100; $('tn').textContent='At these conditions a tank holds about '+Math.abs(pc).toFixed(1)+'% '+(pc>=0?'more':'less')+' gas than the ideal gas law predicts.';
+  var ps=[],zs=[];for(var p=1;p<=300;p+=10){ps.push(p);zs.push(p*vm(p,T,g.a,g.b)/RT)}
+  var lo=Math.min(1,Math.min.apply(null,zs))-0.03, hi=Math.max(1,Math.max.apply(null,zs))+0.03;
+  var X=function(p){return 36+p/300*274}, Yz=function(v){return 130-(v-lo)/(hi-lo)*120};
+  $('cv').setAttribute('points',ps.map(function(p,i){return X(p).toFixed(1)+','+Yz(zs[i]).toFixed(1)}).join(' '));
+  $('z1').setAttribute('y1',Yz(1)); $('z1').setAttribute('y2',Yz(1)); $('zt').setAttribute('y',Yz(1)+3);
+  $('pt').setAttribute('cx',X(P)); $('pt').setAttribute('cy',Yz(z));
+}
+
+// controls
+$('d').oninput=depthUpdate;
+$('p').oninput=tankUpdate; $('t').oninput=tankUpdate;
+$('tg').onclick=function(){tOn=!tOn;pressed(this,tOn);depthUpdate()};
+[['x1',0.21],['x2',0.32],['x3',1]].forEach(function(a){$(a[0]).onclick=function(){mix=a[1];['x1','x2','x3'].forEach(function(i){pressed($(i),i===a[0])});depthUpdate()}});
+[['gN','N'],['gO','O'],['gH','H']].forEach(function(a){$(a[0]).onclick=function(){gas=a[1];['gN','gO','gH'].forEach(function(i){pressed($(i),i===a[0])});tankUpdate()}});
+
+// sunlight fades as you scroll deeper
+function onScroll(){var h=document.documentElement.scrollHeight-innerHeight,p=h>0?scrollY/h:0;$('rays').style.opacity=Math.max(0,1-p*1.6)}
+addEventListener('scroll',onScroll,{passive:true});
+depthUpdate(); tankUpdate(); onScroll();
+</script>
 </body>
 </html>
+
