@@ -11,7 +11,7 @@
     images/balloon.png  (stop 1, resized by the code)
     images/bubble.png   (stop 3, resized by the code)
     images/fish.png     (decoration, appears three times)
-    images/tank.png     (stop 4 )
+    images/tank.png     (stop 4)
   Until a file exists, a dashed placeholder box with the file name is shown instead.
 -->
 <script>
@@ -62,11 +62,13 @@ button:focus-visible,input:focus-visible{outline:3px solid #ffd166;outline-offse
 .track b{position:absolute;top:-4px;width:2px;height:26px;background:#ff8a5c}
 .warn{color:#ffd166;min-height:3em;margin-top:6px}
 input[type=range]{accent-color:#6fd6ff}
-.fish{position:absolute;z-index:0;width:220px;height:auto;opacity:.85;pointer-events:none;animation:sw 16s ease-in-out infinite alternate}
+.fish{position:absolute;z-index:0;width:440px;height:auto;opacity:.85;pointer-events:none;animation:sw 8s ease-in-out infinite alternate}
 @keyframes sw{to{transform:translateX(70px)}}
+.fish.flip{transform:scaleX(-1);animation-name:swf}
+@keyframes swf{to{transform:scaleX(-1) translateX(70px)}}
 footer{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:0 16px 60px;font-size:14px;color:#a9cde3}
 footer p{max-width:46em}
-@media (prefers-reduced-motion:reduce){.fish{animation:none}html{scroll-behavior:auto}}
+@media (prefers-reduced-motion:reduce){.fish,.fish.flip{animation:none}html{scroll-behavior:auto}}
 @media (max-width:600px){.fish{display:none}.stop{padding:16px}}
 </style>
 </head>
@@ -75,15 +77,15 @@ footer p{max-width:46em}
 
 <header class="hero">
   <h1>Deep Dive</h1>
-  <p>Follow a scuba diver down and watch four gas laws appear on the way. Drag the depth slider and see what changes.</p>
+  <p>Strap on your fins and follow our diver down, where four gas laws are waiting along the way. Scroll down the page to visit each stop, and grab the depth bar pinned to the top of your screen to dive deeper or float back up and see what changes.</p>
   <p>This page is a chemistry demonstration, not a dive-planning tool.</p>
   <small>Scroll down to descend</small>
 </header>
 
 <main>
   <img class="fish" src="images/fish.png" data-ph="fish" alt="" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="top:16%;left:2%">
-  <img class="fish" src="images/fish.png" data-ph="fish" alt="" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="top:46%;right:2%;width:180px">
-  <img class="fish" src="images/fish.png" data-ph="fish" alt="" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="top:74%;left:6%;width:240px">
+  <img class="fish flip" src="images/fish.png" data-ph="fish" alt="" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="top:46%;right:2%;width:360px">
+  <img class="fish" src="images/fish.png" data-ph="fish" alt="" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="top:74%;left:6%;width:480px">
 
   <div class="bar">
     <label for="d">Depth</label>
@@ -93,7 +95,7 @@ footer p{max-width:46em}
 
   <section class="stop" id="s1">
     <h2>Stop 1: Descent</h2>
-    <p class="lead">A balloon filled with 1 L of air at the surface goes down with the diver. Pressure rises by about 1 atm for every 10 m, and the balloon shrinks to match. This is Boyle’s law: at constant temperature, P₁V₁ = P₂V₂.</p>
+    <p class="lead">A balloon filled with 1 L of air at the surface goes down with the diver. Pressure rises by about 1 atm for every 10 m, and the balloon shrinks to match. This is Boyle’s law: at constant temperature, P₁V₁ = P₂V₂. Give the depth bar pinned to the top of your screen a tug to send our diver down, then bring them back up, and watch the balloon squish and spring back.</p>
     <div class="cols">
       <div class="scene" id="sc1">
         <img id="diver" src="images/diver.png" data-ph="diver" alt="Hand-drawn diver" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="left:20px;width:100px">
@@ -110,7 +112,7 @@ footer p{max-width:46em}
 
   <section class="stop" id="s2">
     <h2>Stop 2: The mix</h2>
-    <p class="lead">Each gas in the tank adds its own pressure. Dalton’s law says the total is the sum of the partial pressures, and each partial pressure is the mole fraction times the total. The orange marks show commonly cited limits.</p>
+    <p class="lead">Each gas in the tank adds its own pressure. Dalton’s law says the total is the sum of the partial pressures, and each partial pressure is the mole fraction times the total. The orange marks show commonly cited limits. Dive with the depth bar at the top of your screen to crank the total pressure up or down, then choose a breathing gas below to see how the partial pressures respond.</p>
     <div class="cols"><div class="col">
       <div role="group" aria-label="Breathing gas">
         <button class="pill" id="x1" aria-pressed="true">Air, 21% O₂</button>
@@ -128,7 +130,7 @@ footer p{max-width:46em}
 
   <section class="stop" id="s3">
     <h2>Stop 3: Ascent</h2>
-    <p class="lead">The diver exhales a 1 L bubble at 30 m. Slide up and it expands as pressure falls. Turn on water temperature and the bubble also warms, so you need the combined gas law, P₁V₁/T₁ = P₂V₂/T₂.</p>
+    <p class="lead">The diver exhales a 1 L bubble at 30 m. Slide up and it expands as pressure falls. Turn on water temperature and the bubble also warms, so you need the combined gas law, P₁V₁/T₁ = P₂V₂/T₂. Swim the depth bar at the top of your screen back toward 0 m and watch the bubble bob up and puff out.</p>
     <div class="cols">
       <div class="scene" id="sc3">
         <div class="t mk" style="top:150px">bubble released at 30 m</div>
@@ -146,7 +148,7 @@ footer p{max-width:46em}
 
   <section class="stop" id="s4">
     <h2>Stop 4: The tank</h2>
-    <p class="lead">A full tank holds gas at around 200 atm, where the ideal gas law starts to fail. Compare it with a van der Waals model. Z = PV/nRT equals 1 for an ideal gas.</p>
+    <p class="lead">A full tank holds gas at around 200 atm, where the ideal gas law starts to fail. Compare it with a van der Waals model. Z = PV/nRT equals 1 for an ideal gas. Play with the pressure and temperature sliders beside the tank to change what’s going on inside it, and watch the ideal and real gas volumes and the graph react. This stop is on its own: the depth bar at the top won’t change a thing here.</p>
     <div class="cols">
       <img id="tank" src="images/tank.png" data-ph="tank" alt="Hand-drawn tank" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="width:120px;height:auto">
       <div class="col">
