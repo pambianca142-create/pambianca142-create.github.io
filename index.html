@@ -62,10 +62,12 @@ button:focus-visible,input:focus-visible{outline:3px solid #ffd166;outline-offse
 .track b{position:absolute;top:-4px;width:2px;height:26px;background:#ff8a5c}
 .warn{color:#ffd166;min-height:3em;margin-top:6px}
 input[type=range]{accent-color:#6fd6ff}
-.fish{position:absolute;z-index:0;width:440px;height:auto;opacity:.85;pointer-events:none;animation:sw 8s ease-in-out infinite alternate}
-@keyframes sw{to{transform:translateX(70px)}}
+.fish{--ml:max(0px,calc((100vw - 920px) / 2));position:absolute;left:0;z-index:0;width:440px;height:auto;opacity:.85;pointer-events:none;animation:sw 26s linear infinite}
+/* swim from just off the left edge of the screen to just off the right edge, then loop */
+@keyframes sw{from{transform:translateX(calc(-100% - var(--ml)))}to{transform:translateX(calc(100vw - var(--ml)))}}
+/* mirrored fish faces left and swims right to left */
 .fish.flip{transform:scaleX(-1);animation-name:swf}
-@keyframes swf{to{transform:scaleX(-1) translateX(70px)}}
+@keyframes swf{from{transform:translateX(calc(100vw - var(--ml))) scaleX(-1)}to{transform:translateX(calc(-100% - var(--ml))) scaleX(-1)}}
 footer{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:0 16px 60px;font-size:14px;color:#a9cde3}
 footer p{max-width:46em}
 @media (prefers-reduced-motion:reduce){.fish,.fish.flip{animation:none}html{scroll-behavior:auto}}
@@ -83,9 +85,9 @@ footer p{max-width:46em}
 </header>
 
 <main>
-  <img class="fish" src="images/fish.png" data-ph="fish" alt="" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="top:16%;left:2%">
-  <img class="fish flip" src="images/fish.png" data-ph="fish" alt="" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="top:46%;right:2%;width:360px">
-  <img class="fish" src="images/fish.png" data-ph="fish" alt="" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="top:74%;left:6%;width:480px">
+  <img class="fish" src="images/fish.png" data-ph="fish" alt="" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="top:16%;animation-duration:26s;animation-delay:-4s">
+  <img class="fish flip" src="images/fish.png" data-ph="fish" alt="" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="top:46%;width:360px;animation-duration:32s;animation-delay:-14s">
+  <img class="fish" src="images/fish.png" data-ph="fish" alt="" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="top:74%;width:480px;animation-duration:38s;animation-delay:-22s">
 
   <div class="bar">
     <label for="d">Depth</label>
@@ -130,7 +132,7 @@ footer p{max-width:46em}
 
   <section class="stop" id="s3">
     <h2>Stop 3: Ascent</h2>
-    <p class="lead">The diver exhales a 1 L bubble at 30 m. Slide up and it expands as pressure falls. Turn on water temperature and the bubble also warms, so you need the combined gas law, P₁V₁/T₁ = P₂V₂/T₂. Swim the depth bar at the top of your screen back toward 0 m and watch the bubble bob up and puff out.</p>
+    <p class="lead">The diver exhales a 1 L bubble at 30 m. Slide up and it expands as pressure falls. Turn on water temperature and the bubble also warms, so you need the combined gas law, P₁V₁/T₁ = P₂V₂/T₂. Swim the depth bar at the top of your screen back toward 0 m and watch the bubble bob up and puff out. You can also toggle the water temperature to switch between Boyle’s law and the combined gas law.</p>
     <div class="cols">
       <div class="scene" id="sc3">
         <div class="t mk" style="top:150px">bubble released at 30 m</div>
@@ -178,7 +180,15 @@ footer p{max-width:46em}
 </main>
 
 <footer>
-  <p>Notes and sources: add your citations here. Pressure is taken as 1 atm plus 1 atm per 10 m of seawater. The oxygen limit of 1.4 atm and the nitrogen narcosis threshold of about 3.2 atm are commonly cited guidelines and vary by source. Water temperature (25 °C at the surface, 5 °C at 30 m) is an assumed profile. Van der Waals constants are standard textbook values, so check them against your course data table.</p>
+  <p>Notes: Pressure is taken as 1 atm plus 1 atm per 10 m of seawater. The oxygen limit of 1.4 atm and the nitrogen narcosis threshold of about 3.2 atm are commonly cited guidelines and vary by source. Water temperature (25 °C at the surface, 5 °C at 30 m) is an assumed profile.</p>
+  <h3 style="font-weight:400;font-size:17px;color:#cfeaf8;margin:26px 0 8px">References</h3>
+  <ol style="max-width:46em;padding-left:22px;margin:0">
+    <li>Atkins, P.; de Paula, J.; Keeler, J. <i>Atkins’ Physical Chemistry</i>, 11th ed.; Oxford University Press: Oxford, 2018. (Ideal gas law, Boyle’s law, real gases and the van der Waals equation.)</li>
+    <li>Brown, T. L.; LeMay, H. E.; Bursten, B. E.; Murphy, C. J.; Woodward, P. M.; Stoltzfus, M. W. <i>Chemistry: The Central Science</i>, 15th ed.; Pearson: New York, 2022. (Gas laws, Dalton’s law of partial pressures, deviations from ideal behavior.)</li>
+    <li>Zumdahl, S. S.; Zumdahl, S. A.; DeCoste, D. J. <i>Chemistry</i>, 10th ed.; Cengage Learning: Boston, 2018. (Gas pressure, the combined gas law, partial pressures.)</li>
+    <li>Rumble, J. R., Ed. <i>CRC Handbook of Chemistry and Physics</i>, 103rd ed.; CRC Press: Boca Raton, 2022. (Van der Waals constants.)</li>
+    <li>U.S. Navy. <i>U.S. Navy Diving Manual</i>, Revision 7; Naval Sea Systems Command: Washington, DC, 2016. (Oxygen partial pressure limits and nitrogen narcosis in diving.)</li>
+  </ol>
 </footer>
 
 <script>
