@@ -7,7 +7,7 @@
 <!--
   HOW TO REPLACE THE PLACEHOLDERS
   Put your hand-drawn PNGs in an "images" folder next to this file, named exactly:
-    images/diver.png    (stop 1, about 70 px wide on the page)
+    images/diver.png    (stop 1, about 100 px wide on the page)
     images/balloon.png  (stop 1, resized by the code)
     images/bubble.png   (stop 3, resized by the code)
     images/fish.png     (decoration, appears three times)
@@ -62,7 +62,7 @@ button:focus-visible,input:focus-visible{outline:3px solid #ffd166;outline-offse
 .track b{position:absolute;top:-4px;width:2px;height:26px;background:#ff8a5c}
 .warn{color:#ffd166;min-height:3em;margin-top:6px}
 input[type=range]{accent-color:#6fd6ff}
-.fish{position:absolute;z-index:0;width:96px;height:auto;opacity:.85;pointer-events:none;animation:sw 16s ease-in-out infinite alternate}
+.fish{position:absolute;z-index:0;width:220px;height:auto;opacity:.85;pointer-events:none;animation:sw 16s ease-in-out infinite alternate}
 @keyframes sw{to{transform:translateX(70px)}}
 footer{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:0 16px 60px;font-size:14px;color:#a9cde3}
 footer p{max-width:46em}
@@ -82,8 +82,8 @@ footer p{max-width:46em}
 
 <main>
   <img class="fish" src="images/fish.png" data-ph="fish" alt="" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="top:16%;left:2%">
-  <img class="fish" src="images/fish.png" data-ph="fish" alt="" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="top:46%;right:2%;width:80px">
-  <img class="fish" src="images/fish.png" data-ph="fish" alt="" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="top:74%;left:6%;width:110px">
+  <img class="fish" src="images/fish.png" data-ph="fish" alt="" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="top:46%;right:2%;width:180px">
+  <img class="fish" src="images/fish.png" data-ph="fish" alt="" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="top:74%;left:6%;width:240px">
 
   <div class="bar">
     <label for="d">Depth</label>
@@ -96,8 +96,8 @@ footer p{max-width:46em}
     <p class="lead">A balloon filled with 1 L of air at the surface goes down with the diver. Pressure rises by about 1 atm for every 10 m, and the balloon shrinks to match. This is Boyle’s law: at constant temperature, P₁V₁ = P₂V₂.</p>
     <div class="cols">
       <div class="scene" id="sc1">
-        <img id="diver" src="images/diver.png" data-ph="diver" alt="Hand-drawn diver" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="left:34px;width:70px">
-        <img id="balloon" src="images/balloon.png" data-ph="balloon" alt="Hand-drawn balloon" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="left:120px">
+        <img id="diver" src="images/diver.png" data-ph="diver" alt="Hand-drawn diver" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="left:20px;width:100px">
+        <img id="balloon" src="images/balloon.png" data-ph="balloon" data-ar="1.74" alt="Hand-drawn balloon" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="left:140px">
       </div>
       <div class="col">
         <div class="rr"><span>Pressure</span><b id="r1p"></b></div>
@@ -194,9 +194,9 @@ function depthUpdate(){
   var d=+$('d').value, P=1+d/10, y=Y(d);
   $('dl').textContent=d+' m'; $('pl').textContent=P.toFixed(1)+' atm';
   // Stop 1: Boyle's law, balloon filled with 1 L at the surface
-  var V1=1/P, w1=56*Math.cbrt(V1);
-  $('diver').style.top=(y-45)+'px';
-  $('balloon').style.width=w1+'px'; $('balloon').style.top=(y-w1/2-14)+'px';
+  var V1=1/P, w1=44*Math.cbrt(V1), h1=w1*$('balloon').dataset.ar;
+  $('diver').style.top=(y-55)+'px';
+  $('balloon').style.width=w1+'px'; $('balloon').style.top=(y-h1/2)+'px';
   $('r1p').textContent=P.toFixed(1)+' atm'; $('r1v').textContent=V1.toFixed(2)+' L'; $('r1c').textContent=(P*V1).toFixed(2)+' atm·L';
   // Stop 2: Dalton's law
   var po=mix*P, pn=(1-mix)*P;
@@ -208,8 +208,8 @@ function depthUpdate(){
   // Stop 3: combined gas law, 1 L bubble released at 30 m (4 atm)
   var T=tOn?298-20*Math.min(d,30)/30:298, V3;
   if(d>=30){V3=1}else{V3=(4/P)*(T/(tOn?278:298))}
-  var w3=44*Math.cbrt(V3);
-  $('bub').style.width=w3+'px'; $('bub').style.top=(y-w3/2)+'px';
+  var w3=40*Math.cbrt(V3), h3=w3*1.374;
+  $('bub').style.width=w3+'px'; $('bub').style.top=(y-h3/2)+'px';
   $('r3p').textContent=P.toFixed(1)+' atm'; $('r3t').textContent=T.toFixed(0)+' K ('+(T-273).toFixed(0)+' °C)';
   $('r3v').textContent=V3.toFixed(2)+' L'+(d>=30?' (not yet released)':'');
   $('eq3').textContent=tOn?'Combined gas law: the bubble also warms as it rises, so it grows more than Boyle’s law alone predicts.':'Boyle’s law only: temperature is held constant.';
