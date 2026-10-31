@@ -7,10 +7,11 @@
 <!--
   HOW TO REPLACE THE PLACEHOLDERS
   Put your hand-drawn PNGs in an "images" folder next to this file, named exactly:
-    images/diver.png    (stop 1, about 100 px wide on the page)
+    images/diver.png    (stop 1, about 125 px wide on the page)
     images/balloon.png  (stop 1, resized by the code)
     images/bubble.png   (stop 3, resized by the code)
-    images/fish.png     (decoration, appears three times)
+    images/fish.png     (decoration, appears five times)
+    images/coral.png    (decoration, appears three times at the screen edges)
     images/tank.png     (stop 4)
   Until a file exists, a dashed placeholder box with the file name is shown instead.
 -->
@@ -27,7 +28,7 @@ function ph(n){
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{
-  margin:0;overflow-x:hidden;font-family:Georgia,"Times New Roman",serif;color:#e8f6ff;line-height:1.55;
+  position:relative;margin:0;overflow-x:hidden;font-family:Georgia,"Times New Roman",serif;color:#e8f6ff;line-height:1.55;
   /* The scroll-driven look: one tall gradient across the whole page, so scrolling down is going deeper. */
   background:linear-gradient(180deg,#c8f1ff 0%,#74cdf0 12%,#2f97cf 30%,#146099 50%,#09375f 70%,#041a31 86%,#010b16 100%);
 }
@@ -68,14 +69,22 @@ input[type=range]{accent-color:#6fd6ff}
 /* mirrored fish faces left and swims right to left */
 .fish.flip{transform:scaleX(-1);animation-name:swf}
 @keyframes swf{from{transform:translateX(calc(100vw - var(--ml))) scaleX(-1)}to{transform:translateX(calc(-100% - var(--ml))) scaleX(-1)}}
+/* coral at the screen edges; the right-hand ones are mirrored */
+.coral{position:absolute;z-index:0;width:clamp(110px,calc((100vw - 920px) / 2 + 50px),340px);height:auto;pointer-events:none}
+.coral.l{left:0}
+.coral.r{right:0;transform:scaleX(-1)}
 footer{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:0 16px 60px;font-size:14px;color:#a9cde3}
 footer p{max-width:46em}
 @media (prefers-reduced-motion:reduce){.fish,.fish.flip{animation:none}html{scroll-behavior:auto}}
-@media (max-width:600px){.fish{display:none}.stop{padding:16px}}
+@media (max-width:600px){.fish,.coral{display:none}.stop{padding:16px}}
 </style>
 </head>
 <body>
 <div id="rays"></div>
+
+<img class="coral l" src="images/coral.png" alt="" style="top:22%" onerror="this.style.display='none'">
+<img class="coral r" src="images/coral.png" alt="" style="top:52%" onerror="this.style.display='none'">
+<img class="coral l" src="images/coral.png" alt="" style="top:82%" onerror="this.style.display='none'">
 
 <header class="hero">
   <h1>Deep Dive</h1>
@@ -88,6 +97,8 @@ footer p{max-width:46em}
   <img class="fish" src="images/fish.png" data-ph="fish" alt="" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="top:16%;animation-duration:26s;animation-delay:-4s">
   <img class="fish flip" src="images/fish.png" data-ph="fish" alt="" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="top:46%;width:360px;animation-duration:32s;animation-delay:-14s">
   <img class="fish" src="images/fish.png" data-ph="fish" alt="" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="top:74%;width:480px;animation-duration:38s;animation-delay:-22s">
+  <img class="fish flip" src="images/fish.png" data-ph="fish" alt="" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="top:30%;width:400px;animation-duration:34s;animation-delay:-27s">
+  <img class="fish" src="images/fish.png" data-ph="fish" alt="" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="top:60%;width:340px;animation-duration:29s;animation-delay:-9s">
 
   <div class="bar">
     <label for="d">Depth</label>
@@ -100,7 +111,7 @@ footer p{max-width:46em}
     <p class="lead">A balloon filled with 1 L of air at the surface goes down with the diver. Pressure rises by about 1 atm for every 10 m, and the balloon shrinks to match. This is Boyle’s law: at constant temperature, P₁V₁ = P₂V₂. Give the depth bar pinned to the top of your screen a tug to send our diver down, then bring them back up, and watch the balloon squish and spring back.</p>
     <div class="cols">
       <div class="scene" id="sc1">
-        <img id="diver" src="images/diver.png" data-ph="diver" alt="Hand-drawn diver" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="left:20px;width:100px">
+        <img id="diver" src="images/diver.png" data-ph="diver" alt="Hand-drawn diver" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="left:6px;width:125px">
         <img id="balloon" src="images/balloon.png" data-ph="balloon" data-ar="1.74" alt="Hand-drawn balloon" onerror="this.onerror=null;this.src=ph(this.dataset.ph)" style="left:140px">
       </div>
       <div class="col">
@@ -207,7 +218,7 @@ function depthUpdate(){
   $('dl').textContent=d+' m'; $('pl').textContent=P.toFixed(1)+' atm';
   // Stop 1: Boyle's law, balloon filled with 1 L at the surface
   var V1=1/P, w1=44*Math.cbrt(V1), h1=w1*$('balloon').dataset.ar;
-  $('diver').style.top=(y-55)+'px';
+  $('diver').style.top=(y-69)+'px';
   $('balloon').style.width=w1+'px'; $('balloon').style.top=(y-h1/2)+'px';
   $('r1p').textContent=P.toFixed(1)+' atm'; $('r1v').textContent=V1.toFixed(2)+' L'; $('r1c').textContent=(P*V1).toFixed(2)+' atm·L';
   // Stop 2: Dalton's law
